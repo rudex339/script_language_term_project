@@ -9,6 +9,8 @@ from main_data import *
 
 class MainGui:
     result_windows= []
+    c=0
+    buttonl = []
     def __init__(self) -> None:
         self.search_window = Tk()
         self.search_window.title("게임 영수증")
@@ -49,19 +51,26 @@ class MainGui:
         self.search_window.mainloop()
     def purchase(self, data):
         puchase(data["name"], data["steam_appid"], data["price_overview"]["final"])
-        self.moneylabel.configure(text=str(return_money()) + " 원")
-        print(str(return_money())+"원")
         self.create_buttons()
+        self.moneylabel.configure(text=str(return_money()) + " 원")
         pass
 
+    def cancel_buy(self, p):
+        for item in buylist:
+            if item[2] == p:
+                buylist.remove(item)
+                break
+        self.create_buttons()
+        self.moneylabel.configure(text=str(return_money()) + " 원")
     def create_buttons(self):
-        buttons = self.canvas.find_withtag("games")
-        for button in buttons:
-            self.frame.delete(button)
+        for b in self.buttonl: # result_windows에서 버튼 ID를 가져옵니다
+            b.destroy() # 버튼 태그(버튼 ID)를 사용하여 버튼을 삭제합니다
+        self.buttonl.clear()
         for i, game in enumerate(buylist):
-            button = Button(self.frame, text=str(game[0]) + " " + str(game[1]))
+            button = Button(self.frame, text=str(game[0]) + " " + str(game[1]), command=lambda g=game[2]: self.cancel_buy(g))
             button.grid(row=i, column=0, pady=5)
-            button.bindtags((str(button), "games", "Button", ".", "all"))
+
+            self.buttonl.append(button)  # 버튼 ID를 result_windows에 저장합니다
 
     def open_find_window(self):
         gamename = str(self.search_entry.get())
@@ -74,32 +83,48 @@ class MainGui:
         with urllib.request.urlopen(url) as u:
             raw_data = u.read()
         im = Image.open(BytesIO(raw_data))
-        self.image = ImageTk.PhotoImage(im)
-        Label(window, image=self.image).grid(row=0, column=0)
+        image = ImageTk.PhotoImage(im, master=window)
+        label = Label(window)
+        label.image = image  # 이미지 객체에 대한 참조 유지
+        label.configure(image=image)
+        label.grid(row=0, column=0)
+
+        Label(window, text=data["name"], font=self.TempFont).grid(row=0, column=1)
+#스크린 샷
+        scList= []
+        for sc in data["screenshots"]:
+            scList.append(sc["path_thumbnail"])
+        id = 0
+
+        url = scList[id]
         with urllib.request.urlopen(url) as u:
             raw_data = u.read()
         im = Image.open(BytesIO(raw_data))
-        self.image = ImageTk.PhotoImage(im)
+        image = ImageTk.PhotoImage(im, master=window)
         label = Label(window)
-        label.image = self.image  # 이미지 객체에 대한 참조 유지
-        label.configure(image=self.image)
-        label.grid(row=0, column=0)
-        #result window에 들어가야하는것은 data와 멀티미디어 정도
+        label.image = image  # 이미지 객체에 대한 참조 유지
+        label.configure(image=image)
+        label.grid(row=1, column=2)
 
-        window.protocol("WM_DELETE_WINDOW", lambda: self.close_result_window(window))
+        button = Button(window, text=str(str(data["price_overview"]["final"]) + " 담기"), command=lambda: self.purchase(data))
+        button.grid(row=0, column=2)
+        #result window에 들어가야하는것은 data와 멀티미디어 정도
+        self.result_windows.append([self.c,id, scList,label])
+        value = self.c
+        window.protocol("WM_DELETE_WINDOW", lambda: self.close_result_window(window,value))
         self.result_windows.append(window)
         window.mainloop()
+        self.c += 1
     
     def close_search_window(self):
-        for window in self.result_windows:
-            window.destroy()
         self.result_windows.clear()
-
         self.search_window.destroy()
     
-    def close_result_window(self, value):
-        value.destroy()
-        self.result_windows.remove(value)
+    def close_result_window(self,window, value):
+        window.destroy()
+        for item in self.result_windows:
+            if item[0] == value:
+                self.result_windows.remove(item)
 
 
 
