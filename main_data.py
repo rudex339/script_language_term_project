@@ -40,10 +40,9 @@ def game_list_find(name):
 def puchase(name, id, price):
     global total_price
     buylist.append([name, int(price)//100, id])
-    total_price = sum(item[1] for item in buylist)
 
 def return_money():
-    return total_price
+    return sum(item[1] for item in buylist)
 
 
 
