@@ -13,41 +13,23 @@ class MainGui:
     buttonl = []
     def __init__(self) -> None:
         self.search_window = Tk()
+        self.search_window.geometry("210x225")
         self.search_window.title("게임 영수증")
-        self.TempFont = font.Font(size=16, weight='bold', family='Consolas')
+        self.TempFont = font.Font(size=10, family='Consolas')
         #검색 entry
         self.search_entry = Entry(self.search_window,font=self.TempFont)
-        self.search_entry.grid(row=0, column=0)
+        self.search_entry.place(x=10, y=12)
+
+        self.frame = Frame()
 
         # 검색 button
-        Button(self.search_window, text="검색", font=self.TempFont, command = self.open_find_window).grid(row=0, column=1)
+        Button(self.search_window, text="검색", font=self.TempFont, command = self.open_find_window).place(x=165, y=10)
 
         self.moneylabel = Label(self.search_window, text=str(total_price) + " 원", font=self.TempFont)
-        self.moneylabel.grid(row=2, column=0)
-
-        # 스크롤바와 Canvas
-        scrollbar = Scrollbar(self.search_window)
-        scrollbar.grid(row=1, column=2, sticky="NS")
-
-        # Canvas 생성
-        self.canvas = Canvas(self.search_window, yscrollcommand=scrollbar.set)
-        self.canvas.grid(row=1, column=0, columnspan=2, sticky="NSEW")
-
-        # 스크롤바와 Canvas 연결
-        scrollbar.config(command=self.canvas.yview)
+        self.moneylabel.place(x=150, y=200)
 
         # 프레임 생성
-        self.frame = Frame(self.canvas)
-        self.canvas.create_window((0, 0), window=self.frame, anchor="nw")
 
-        # 프레임에 버튼 생성
-        self.create_buttons()
-        # 스크롤바 설정
-        self.frame.update_idletasks()
-        self.canvas.config(scrollregion=self.canvas.bbox("all"))
-
-
-        self.search_window.protocol("WM_DELETE_WINDOW", self.close_search_window)
         self.search_window.mainloop()
     def purchase(self, data):
         puchase(data["name"], data["steam_appid"], data["price_overview"]["final"])
