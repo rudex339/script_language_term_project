@@ -20,22 +20,33 @@ class MainGui:
         self.search_entry = Entry(self.search_window,font=self.TempFont)
         self.search_entry.place(x=10, y=12)
 
-        self.frame = Frame()
-
         # 검색 button
-        Button(self.search_window, text="검색", font=self.TempFont, command = self.open_find_window).place(x=165, y=10)
+        Button(self.search_window, text="검색", font=self.TempFont, command=self.open_find_window).place(x=165, y=10)
 
-        self.moneylabel = Label(self.search_window, text=str(total_price) + " 원", font=self.TempFont)
-        self.moneylabel.place(x=150, y=200)
+        #프레임
+        self.frame = Frame(self.search_window, height = 100)
+        self.frame.place(x=9, y = 35)
+        #스크롤바
+        scrollbar = Scrollbar(self.frame)
+        scrollbar.pack(side = "right", fill = "both")
+
+        self.listbox = Listbox(self.frame, yscrollcommand=scrollbar.set)
+        self.listbox.pack(side="left",fill="both")
+
+        scrollbar.config(command = self.listbox.yview)
+
+
+
+        self.moneylabel = Label(self.search_window, text=str(total_price) + " 원", font=self.TempFont,justify = "right")
+        self.moneylabel.place(x=50, y=200)
 
         # 프레임 생성
 
         self.search_window.mainloop()
     def purchase(self, data):
-        puchase(data["name"], data["steam_appid"], data["price_overview"]["final"])
-        self.create_buttons()
+        index = puchase(data["name"], data["steam_appid"], data["price_overview"]["final"])
+        self.listbox.insert(index,data["name"]+" "+str(data["price_overview"]["final"])+"원")
         self.moneylabel.configure(text=str(return_money()) + " 원")
-        pass
 
     def cancel_buy(self, p):
         for item in buylist:
@@ -44,15 +55,6 @@ class MainGui:
                 break
         self.create_buttons()
         self.moneylabel.configure(text=str(return_money()) + " 원")
-    def create_buttons(self):
-        for b in self.buttonl: # result_windows에서 버튼 ID를 가져옵니다
-            b.destroy() # 버튼 태그(버튼 ID)를 사용하여 버튼을 삭제합니다
-        self.buttonl.clear()
-        for i, game in enumerate(buylist):
-            button = Button(self.frame, text=str(game[0]) + " " + str(game[1]), command=lambda g=game[2]: self.cancel_buy(g))
-            button.grid(row=i, column=0, pady=5)
-
-            self.buttonl.append(button)  # 버튼 ID를 result_windows에 저장합니다
 
     def open_find_window(self):
         gamename = str(self.search_entry.get())
