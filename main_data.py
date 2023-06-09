@@ -2,6 +2,9 @@ import requests
 import xml.etree.ElementTree as ET
 import json
 import re
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 params = {
     "key": "4C882AC12E087E0B0E834D14F1B74EA3",
