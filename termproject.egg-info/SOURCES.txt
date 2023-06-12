@@ -1,0 +1,10 @@
+find_window.py
+main_data.py
+noti.py
+search_window.py
+setup.py
+telegrambot.py
+termproject.egg-info/PKG-INFO
+termproject.egg-info/SOURCES.txt
+termproject.egg-info/dependency_links.txt
+termproject.egg-info/top_level.txt
